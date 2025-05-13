@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema({
   father: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // 父亲
   mother: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // 母亲
   children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // 子女
+  avatar: { type: String, required: false }, // Avatar field to store file path
 });
 
 const User = mongoose.model('User', userSchema);
@@ -111,6 +112,24 @@ app.delete('/users/:id', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Upload or Update Avatar
+app.post('/users/:id/avatar', upload.single('avatar'), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update avatar field with file path
+    user.avatar = `/uploads/${req.file.filename}`;
+    await user.save();
+
+    res.status(200).json({ message: 'Avatar uploaded successfully', avatar: user.avatar });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
