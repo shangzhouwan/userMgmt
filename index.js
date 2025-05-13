@@ -17,11 +17,36 @@ mongoose.connect('mongodb://localhost:27017/user_management', {
 // User Schema
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  gender: { type: String, required: true },
-  avator: { type: String, required: false },
   email: { type: String, required: true, unique: true },
   age: { type: Number, required: true },
-  note: { type: String, required: false }
+  gender: { type: String, enum: ['Male', 'Female', 'Other'], required: false }, // 性别
+  address: { type: String, required: false }, // 地址
+  phone: { type: String, required: false }, // 手机
+  education: { type: String, required: false }, // 学历
+  educationHistory: [
+    {
+      institution: { type: String, required: true }, // 学校名称
+      degree: { type: String, required: false },     // 学位
+      fieldOfStudy: { type: String, required: false }, // 专业领域
+      startDate: { type: Date, required: false },    // 开始时间
+      endDate: { type: Date, required: false },      // 结束时间
+    },
+  ], // 学习经历
+  workHistory: [
+    {
+      company: { type: String, required: true },     // 公司名称
+      role: { type: String, required: true },        // 职位
+      startDate: { type: Date, required: false },    // 开始时间
+      endDate: { type: Date, required: false },      // 结束时间
+      description: { type: String, required: false }, // 工作描述
+    },
+  ], // 工作经历
+  notes: { type: String, required: false }, // 备注
+  birthDate: { type: Date, required: false }, // 出生年月
+  deathDate: { type: Date, required: false }, // 死亡年月
+  father: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // 父亲
+  mother: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }, // 母亲
+  children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // 子女
 });
 
 const User = mongoose.model('User', userSchema);
